@@ -1,4 +1,4 @@
-import {keymap, highlightSpecialChars, drawSelection, highlightActiveLine, EditorView} from '@codemirror/view';
+import {keymap, highlightSpecialChars, drawSelection, highlightActiveLine, EditorView, ViewUpdate} from '@codemirror/view';
 import {Extension, EditorState} from '@codemirror/state';
 import {history, historyKeymap} from '@codemirror/history';
 import {foldGutter, foldKeymap} from '@codemirror/fold';
@@ -14,7 +14,8 @@ import {rectangularSelection} from '@codemirror/rectangular-selection';
 import {defaultHighlightStyle} from '@codemirror/highlight';
 import {lintKeymap} from '@codemirror/lint';
 import {python} from '@codemirror/lang-python';
-import { cursorTooltip } from './tooltip';
+import { cursorTooltip, diagnosticsArrived } from './tooltip';
+import type { Diagnostic } from '../pyrightTypes';
 
 
 const basicSetup = [
@@ -48,6 +49,8 @@ const basicSetup = [
 export interface Editor {
   view: EditorView,
   read: () => string,
+  onUpdate: (handler: (_: ViewUpdate) => void) => void,
+  updateTooltips: (diagnostics: Diagnostic[]) => void,
 }
 
 export const makeEditor = (...exts: Extension[]): Editor => {
@@ -70,9 +73,12 @@ export const makeEditor = (...exts: Extension[]): Editor => {
     },
   });
 
+  const updateListeners: ((_: ViewUpdate) => void)[] = [];
+  const updateListener = EditorView.updateListener.of(update => updateListeners.forEach(f => f(update)));
+
   const startState = EditorState.create({
-    doc: "def f(x: int) -> str:\n    return x",
-    extensions: [...basicSetup, ...exts, python(), ...cursorTooltip(), theme],
+    doc: "def f(foooo: int) -> str:\n    return foooo",
+    extensions: [...basicSetup, ...exts, python(), ...cursorTooltip(), theme, updateListener],
   });
 
   const view = new EditorView({
@@ -81,6 +87,10 @@ export const makeEditor = (...exts: Extension[]): Editor => {
 
   return {
     view,
-    read: (): string => view.state.doc.toJSON().join('\n')
+    read: (): string => view.state.doc.toJSON().join('\n'),
+    onUpdate: handler => updateListeners.push(handler),
+    updateTooltips: diagnostics => {
+      view.dispatch({effects: diagnosticsArrived.of(diagnostics)});
+    }
   };
 };

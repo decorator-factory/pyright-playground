@@ -4,10 +4,9 @@ import type { Editor } from "./editor";
 import type { PyrightOutput } from "./pyrightTypes"
 
 import {onMount} from "svelte";
+import { addSquigglyLines, resetSquigglyLines } from "./editor/squiggly-lines";
 
 export let apiEndpoint: string;
-
-let container: HTMLElement;
 
 
 const lineAndColToPos = (line: number, col: number, code: string) => {
@@ -37,6 +36,10 @@ const fetchAndApplyPyrightDiagnostic = async () => {
         },
     );
     const pyrightOutput: PyrightOutput = await resp.json();
+
+    resetSquigglyLines(editor.view);
+    addSquigglyLines(editor.view, pyrightOutput.generalDiagnostics);
+    editor.updateTooltips(pyrightOutput.generalDiagnostics);
 }
 
 
@@ -54,7 +57,14 @@ const updateEditor = async () => {
 
 
 onMount(() => {
+    editor.onUpdate(async (update) => {
+        if (!update.docChanged)
+            return;
 
+        await updateEditor();
+    });
+
+    updateEditor();
 })
 
 </script>
