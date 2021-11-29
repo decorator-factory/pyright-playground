@@ -1,98 +1,60 @@
 <script lang="ts">
+import CodeMirror from "./editor/CodeMirror.svelte";
+import type { Editor } from "./editor";
+import type { PyrightOutput } from "./pyrightTypes"
+
 import {onMount} from "svelte";
-import * as monaco from "monaco-editor";
 
 export let apiEndpoint: string;
 
 let container: HTMLElement;
 
-type PyrightOutput = {
-    version: string,
-    time: string,
-    generalDiagnostics: Diagnostic[],
-    summary: {
-        filesAnalyzed: number,
-        errorCount: number,
-        warningCount: number,
-        informationCount: number,
-        timeInSec: number
-    }
-};
 
-type Diagnostic = {
-    file: string,
-    severity: 'error' | 'warning' | 'information',
-    message: string,
-    rule?: string,
-    range: {
-        start: {
-            line: number,
-            character: number
-        },
-        end: {
-            line: number,
-            character: number
-        }
-    }
-};
+const lineAndColToPos = (line: number, col: number, code: string) => {
+    const lines = code.split("\n");
+    if (lines.length < line)
+        return code.length - 1;
+    const lengthSoFar = lines.slice(0, line + 1).reduce((a, line) => a + line.length, 0);
+    return lengthSoFar + col;
+}
 
 
 let lastUpdatedMs = Date.now() - 1000;
 let updateTimeoutId: any = -1;
+let editor: Editor;
 
 
-const fetchAndApplyPyrightDiagnostic = async (editor: monaco.editor.IStandaloneCodeEditor) => {
-    const code = editor.getValue();
-    const resp = await fetch(apiEndpoint, {method: "POST", body: JSON.stringify({code})});
+const fetchAndApplyPyrightDiagnostic = async () => {
+    const code = editor.read();
+    const resp = await fetch(
+        apiEndpoint,
+        {
+            method: "POST",
+            body: JSON.stringify({code}),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        },
+    );
     const pyrightOutput: PyrightOutput = await resp.json();
-
-    let markers = pyrightOutput.generalDiagnostics.map(diag => ({
-        severity: {
-            error: monaco.MarkerSeverity.Error,
-            warning: monaco.MarkerSeverity.Warning,
-            information: monaco.MarkerSeverity.Info,
-        }[diag.severity],
-
-        message: diag.message,
-
-        startLineNumber: diag.range.start.line + 1,
-        startColumn: diag.range.start.character + 1,
-        endLineNumber: diag.range.end.line + 1,
-        endColumn: diag.range.end.character + 1,
-    }));
-
-    monaco.editor.setModelMarkers(editor.getModel()!, "owner", markers);
 }
 
 
-const updateEditor = async (editor: monaco.editor.IStandaloneCodeEditor) => {
+const updateEditor = async () => {
     const diff = Date.now() - lastUpdatedMs;
     if (diff < 1000) {
         if (updateTimeoutId !== -1)
             clearTimeout(updateTimeoutId);
-        updateTimeoutId = setTimeout(() => updateEditor(editor), 1000 - diff);
+        updateTimeoutId = setTimeout(updateEditor, 1000 - diff);
         return;
     }
     lastUpdatedMs = Date.now();
-    await fetchAndApplyPyrightDiagnostic(editor);
+    await fetchAndApplyPyrightDiagnostic();
 };
 
 
 onMount(() => {
-    const editor = monaco.editor.create(
-        container,
-        {
-            value: "def f(x: int) -> str:\n    return x",
-            language: 'python',
-            automaticLayout: true,
-        }
-    );
 
-    updateEditor(editor);
-
-    editor.getModel()!.onDidChangeContent(async (event) => {
-        await updateEditor(editor);
-    });
 })
 
 </script>
@@ -101,7 +63,11 @@ onMount(() => {
     <div class="title">Pyright playground</div>
     <div class="controls">Controls (TODO)</div>
     <div class="editor">
-        <div class="editor-container" bind:this={container}></div>
+        <p class="editor-help">
+            <b>To indent, press Ctrl+]. To unindent, press Ctrl+[.</b>
+            This helps with accessibility: you should be able to tab out of the editor.
+        </p>
+        <CodeMirror bind:editor/>
     </div>
     <div class="footer">BTW: This website is not run by Microsoft or the Pyright maintainers.</div>
 </main>
@@ -158,12 +124,13 @@ main {
 }
 
 .editor {
-    padding-top: 2em;
-    grid-area: editor;
-
-    >.editor-container{
-        height: 100%;
+    >.editor-help {
+        padding: 1em;
+        font-size: 1.0rem;
     }
+    grid-area: editor;
+    font-size: 1.3rem;
+    --codemirror-min-height: 50vh;
 }
 
 .footer {
