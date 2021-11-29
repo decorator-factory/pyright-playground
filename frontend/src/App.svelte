@@ -36,7 +36,12 @@ type Diagnostic = {
     }
 };
 
-const updateEditor = async (editor: monaco.editor.IStandaloneCodeEditor) => {
+
+let lastUpdatedMs = Date.now() - 3000;
+let updateTimeoutId: any = -1;
+
+
+const fetchAndApplyPyrightDiagnostic = async (editor: monaco.editor.IStandaloneCodeEditor) => {
     const code = editor.getValue();
     const resp = await fetch(apiEndpoint, {method: "POST", body: JSON.stringify({code})});
     const pyrightOutput: PyrightOutput = await resp.json();
@@ -57,6 +62,19 @@ const updateEditor = async (editor: monaco.editor.IStandaloneCodeEditor) => {
     }));
 
     monaco.editor.setModelMarkers(editor.getModel()!, "owner", markers);
+}
+
+
+const updateEditor = async (editor: monaco.editor.IStandaloneCodeEditor) => {
+    const diff = Date.now() - lastUpdatedMs;
+    if (diff < 3000) {
+        if (updateTimeoutId !== -1)
+            clearTimeout(updateTimeoutId);
+        updateTimeoutId = setTimeout(() => updateEditor(editor), 3000 - diff);
+        return;
+    }
+    lastUpdatedMs = Date.now();
+    await fetchAndApplyPyrightDiagnostic(editor);
 };
 
 
