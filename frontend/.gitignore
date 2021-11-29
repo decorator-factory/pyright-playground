@@ -1,3 +1,4 @@
 /node_modules/
 /public/build/
+/public/settings.js
 .vscode/

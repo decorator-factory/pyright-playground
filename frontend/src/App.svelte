@@ -1,15 +1,154 @@
 <script lang="ts">
-    export let name: string;
+import {onMount} from "svelte";
+import * as monaco from "monaco-editor";
+
+export let apiEndpoint: string;
+
+let container: HTMLElement;
+
+type PyrightOutput = {
+    version: string,
+    time: string,
+    generalDiagnostics: Diagnostic[],
+    summary: {
+        filesAnalyzed: number,
+        errorCount: number,
+        warningCount: number,
+        informationCount: number,
+        timeInSec: number
+    }
+};
+
+type Diagnostic = {
+    file: string,
+    severity: 'error' | 'warning' | 'information',
+    message: string,
+    rule?: string,
+    range: {
+        start: {
+            line: number,
+            character: number
+        },
+        end: {
+            line: number,
+            character: number
+        }
+    }
+};
+
+const updateEditor = async (editor: monaco.editor.IStandaloneCodeEditor) => {
+    const code = editor.getValue();
+    const resp = await fetch(apiEndpoint, {method: "POST", body: JSON.stringify({code})});
+    const pyrightOutput: PyrightOutput = await resp.json();
+
+    let markers = pyrightOutput.generalDiagnostics.map(diag => ({
+        severity: {
+            error: monaco.MarkerSeverity.Error,
+            warning: monaco.MarkerSeverity.Warning,
+            information: monaco.MarkerSeverity.Info,
+        }[diag.severity],
+
+        message: diag.message,
+
+        startLineNumber: diag.range.start.line + 1,
+        startColumn: diag.range.start.character + 1,
+        endLineNumber: diag.range.end.line + 1,
+        endColumn: diag.range.end.character + 1,
+    }));
+
+    monaco.editor.setModelMarkers(editor.getModel()!, "owner", markers);
+};
+
+
+onMount(() => {
+    const editor = monaco.editor.create(
+        container,
+        {
+            value: "def f(x: int) -> str:\n    return x",
+            language: 'python',
+            automaticLayout: true,
+        }
+    );
+
+    updateEditor(editor);
+
+    editor.getModel()!.onDidChangeContent(async (event) => {
+        await updateEditor(editor);
+    });
+})
+
 </script>
 
 <main>
-    <h1>Hello, {name}!</h1>
+    <div class="title">Pyright playground</div>
+    <div class="controls">Controls (TODO)</div>
+    <div class="editor">
+        <div class="editor-container" bind:this={container}></div>
+    </div>
+    <div class="footer">BTW: This website is not run by Microsoft or the Pyright maintainers.</div>
 </main>
 
 <style lang="scss">
-$h1-color: red;
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
-h1 {
-    color: $h1-color;
+:global(html, body) {
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 24em auto;
+    grid-template-rows: 5em auto 8em;
+
+    grid-template-areas:
+        "title controls"
+        "editor editor"
+        "footer footer"
+    ;
+
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.title, .controls, .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    grid-area: title;
+
+    font-family: "Roboto";
+    font-size: 2rem;
+
+    background-color: #6acbf1;
+}
+
+.controls {
+    justify-content: start;
+    padding-left: 3em;
+
+    grid-area: controls;
+
+    font-family: "Roboto";
+
+    background-color: #9fd4e9;
+}
+
+.editor {
+    padding-top: 2em;
+    grid-area: editor;
+
+    >.editor-container{
+        height: 100%;
+    }
+}
+
+.footer {
+    grid-area: footer;
 }
 </style>
