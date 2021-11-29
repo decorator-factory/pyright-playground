@@ -1,0 +1,6 @@
+{
+    "dependencies": {
+        "pyright-v1.1.181": "npm:pyright@1.1.181",
+        "pyright-v1.1.190": "npm:pyright@1.1.190"
+    }
+}

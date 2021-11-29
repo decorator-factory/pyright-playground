@@ -1,0 +1,6 @@
+[flake8]
+inline-quotes = double
+max-line-length = 100
+ignore =
+    DAR101
+    DAR201
