@@ -37,7 +37,7 @@ type Diagnostic = {
 };
 
 
-let lastUpdatedMs = Date.now() - 3000;
+let lastUpdatedMs = Date.now() - 1000;
 let updateTimeoutId: any = -1;
 
 
@@ -67,10 +67,10 @@ const fetchAndApplyPyrightDiagnostic = async (editor: monaco.editor.IStandaloneC
 
 const updateEditor = async (editor: monaco.editor.IStandaloneCodeEditor) => {
     const diff = Date.now() - lastUpdatedMs;
-    if (diff < 3000) {
+    if (diff < 1000) {
         if (updateTimeoutId !== -1)
             clearTimeout(updateTimeoutId);
-        updateTimeoutId = setTimeout(() => updateEditor(editor), 3000 - diff);
+        updateTimeoutId = setTimeout(() => updateEditor(editor), 1000 - diff);
         return;
     }
     lastUpdatedMs = Date.now();
