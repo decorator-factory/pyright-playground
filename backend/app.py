@@ -12,7 +12,7 @@ import contextlib
 import json
 import tempfile
 from pathlib import Path
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator, Callable, Optional
 
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
@@ -20,6 +20,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
+from starlette.types import ASGIApp
 
 MAX_REQUEST_BODY_BYTES = 10**7
 
@@ -87,7 +88,22 @@ async def entry_point(req: Request) -> Response:
     return JSONResponse(pyright_output)
 
 
+class _BetterMiddleware(Middleware):
+    def __init__(self, fn: Callable[[ASGIApp], ASGIApp]):
+        self._fn = fn
+
+    def __iter__(self):
+        yield from (lambda app: self._fn(app), {})
+
+
+_cors_middleware = _BetterMiddleware(lambda app: CORSMiddleware(
+    app,
+    allow_origins=["*"],
+    allow_methods=["POST"],
+    allow_headers=["content-type"],
+))
+
 app = Starlette(
     routes=[Route("/pyright", entry_point, methods=["POST"])],
-    middleware=[Middleware(CORSMiddleware, allow_origins=["*"])],  # TODO:
+    middleware=[_cors_middleware],
 )

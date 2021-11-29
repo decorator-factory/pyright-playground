@@ -1,6 +1,10 @@
 [flake8]
+max-imports = 20
 inline-quotes = double
 max-line-length = 100
 ignore =
     DAR101
     DAR201
+    D101
+    D105
+    D107
