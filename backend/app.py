@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import AsyncGenerator, Optional
 
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
@@ -85,4 +87,7 @@ async def entry_point(req: Request) -> Response:
     return JSONResponse(pyright_output)
 
 
-app = Starlette(routes=[Route("/pyright", entry_point, methods=["POST"])])
+app = Starlette(
+    routes=[Route("/pyright", entry_point, methods=["POST"])],
+    middleware=[Middleware(CORSMiddleware, allow_origins=["*"])],  # TODO:
+)
