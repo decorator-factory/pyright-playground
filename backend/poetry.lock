@@ -301,6 +301,7 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
+typing-extensions = {version = ">=3.7.4.3", markers = "python_version < \"3.10\""}
 
 [[package]]
 name = "h11"
@@ -541,8 +542,8 @@ typing_extensions = ">=3.6,<4.0"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.10"
-content-hash = "b59ae6e23d1399fd94da10c5a05ca44c6a2f6d7c8dd8b8e8666f717ca1f57a23"
+python-versions = "^3.9"
+content-hash = "b2badb24f6487e4e453137feeab972fb92c22561ed9de41a54a9c3f30236dbbb"
 
 [metadata.files]
 anyio = [
