@@ -23,6 +23,7 @@ import { lintKeymap } from "@codemirror/lint"
 import { python } from "@codemirror/lang-python"
 import { cursorTooltip, diagnosticsArrived } from "./tooltip"
 import type { Diagnostic } from "../pyrightTypes"
+import { addSquigglyLines, resetSquigglyLines } from "./squiggly-lines"
 
 const basicSetup = [
     lineNumbers(),
@@ -55,7 +56,7 @@ export interface Editor {
     view: EditorView
     read: () => string
     onUpdate: (handler: (_: ViewUpdate) => void) => void
-    updateTooltips: (diagnostics: Diagnostic[]) => void
+    applyDiagnostics: (diagnostics: Diagnostic[]) => void
 }
 
 export const makeEditor = (...exts: Extension[]): Editor => {
@@ -103,7 +104,9 @@ export const makeEditor = (...exts: Extension[]): Editor => {
         view,
         read: (): string => view.state.doc.toJSON().join("\n"),
         onUpdate: (handler) => updateListeners.push(handler),
-        updateTooltips: (diagnostics) => {
+        applyDiagnostics: (diagnostics) => {
+            resetSquigglyLines(view)
+            addSquigglyLines(view, diagnostics)
             view.dispatch({ effects: diagnosticsArrived.of(diagnostics) })
         },
     }

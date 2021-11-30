@@ -4,10 +4,6 @@
     import type { PyrightOutput } from "./pyrightTypes"
 
     import { onMount } from "svelte"
-    import {
-        addSquigglyLines,
-        resetSquigglyLines,
-    } from "./editor/squiggly-lines"
 
     export let apiEndpoint: string
 
@@ -35,9 +31,7 @@
         })
         const pyrightOutput: PyrightOutput = await resp.json()
 
-        resetSquigglyLines(editor.view)
-        addSquigglyLines(editor.view, pyrightOutput.generalDiagnostics)
-        editor.updateTooltips(pyrightOutput.generalDiagnostics)
+        editor.applyDiagnostics(pyrightOutput.generalDiagnostics)
     }
 
     const updateEditor = async () => {
