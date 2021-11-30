@@ -6,6 +6,8 @@ I started this yesterday as of writing this, so it's really basic.
 
 See it in action here: [Pyright playground](https://pyright-playground.decorator-factory.su/)
 
+![Demonstration](demo.gif)
+
 ### TODO:
 
 - [ ] FEATURE: Python version picker
