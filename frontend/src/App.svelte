@@ -140,6 +140,7 @@
         > .editor-help {
             padding: 1em;
             font-size: 1rem;
+            font-family: "Roboto";
         }
         grid-area: editor;
         font-size: 1.3rem;
