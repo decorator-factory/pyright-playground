@@ -4,7 +4,12 @@ import type { Diagnostic } from "../pyrightTypes"
 import { computePos } from "./horizontal-offset"
 import { RangeSet } from "@codemirror/rangeset"
 
-const addUnderline = StateEffect.define<{ from: number; to: number }>()
+const addUnderline =
+    StateEffect.define<{
+        from: number
+        to: number
+        severity: "error" | "warning" | "information"
+    }>()
 const removeUnderlines = StateEffect.define()
 
 const underlineField = StateField.define<DecorationSet>({
@@ -15,9 +20,7 @@ const underlineField = StateField.define<DecorationSet>({
         if (tr.docChanged) return RangeSet.empty
 
         for (let e of tr.effects)
-            if (e.is(removeUnderlines))
-                return RangeSet.empty
-
+            if (e.is(removeUnderlines)) return RangeSet.empty
 
         for (let e of tr.effects)
             if (e.is(addUnderline)) {
@@ -25,7 +28,12 @@ const underlineField = StateField.define<DecorationSet>({
                 if (e.value.to > tr.newDoc.length) continue
 
                 underlines = underlines.update({
-                    add: [underlineMark.range(e.value.from, e.value.to)],
+                    add: [
+                        underlineMark[e.value.severity].range(
+                            e.value.from,
+                            e.value.to,
+                        ),
+                    ],
                 })
             }
 
@@ -34,13 +42,22 @@ const underlineField = StateField.define<DecorationSet>({
     provide: (f) => EditorView.decorations.from(f),
 })
 
-const underlineMark = Decoration.mark({ class: "cm-underline" })
+const underlineMark = {
+    error: Decoration.mark({ class: "cm-underline --error" }),
+    warning: Decoration.mark({ class: "cm-underline --warning" }),
+    information: Decoration.mark({ class: "cm-underline --information" }),
+}
 
 const underlineTheme = EditorView.baseTheme({
     ".cm-underline": {
-        textDecoration: "underline 3px red",
-        backgroundColor: "rgba(255, 0, 0, 0.1)",
+        textDecoration:
+            "underline 3px hsla(var(--cm-underline-hue), 100%, 50%, 1)",
+        backgroundColor: "hsla(var(--cm-underline-hue), 100%, 50%, 0.1)",
     },
+
+    ".--error": { "--cm-underline-hue": "0" },
+    ".--warning": { "--cm-underline-hue": "36" },
+    ".--information": { "--cm-underline-hue": "204" },
 })
 
 export const addSquigglyLines = (
@@ -61,8 +78,9 @@ export const addSquigglyLines = (
                 diag.range.end.line + 1,
                 diag.range.end.character,
             ),
+            severity: diag.severity,
         }))
-        .map(({ from, to }) => addUnderline.of({ from, to }))
+        .map((spec) => addUnderline.of(spec))
 
     if (effects.length === 0) return
 
