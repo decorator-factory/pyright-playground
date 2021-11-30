@@ -4,12 +4,11 @@ import type { Diagnostic } from "../pyrightTypes"
 import { computePos } from "./horizontal-offset"
 import { RangeSet } from "@codemirror/rangeset"
 
-const addUnderline =
-    StateEffect.define<{
-        from: number
-        to: number
-        severity: "error" | "warning" | "information"
-    }>()
+const addUnderline = StateEffect.define<{
+    from: number
+    to: number
+    severity: "error" | "warning" | "information"
+}>()
 const removeUnderlines = StateEffect.define()
 
 const underlineField = StateField.define<DecorationSet>({
@@ -43,21 +42,16 @@ const underlineField = StateField.define<DecorationSet>({
 })
 
 const underlineMark = {
-    error: Decoration.mark({ class: "cm-underline --error" }),
-    warning: Decoration.mark({ class: "cm-underline --warning" }),
-    information: Decoration.mark({ class: "cm-underline --information" }),
+    error: Decoration.mark({ class: "cm-underline --sev-error" }),
+    warning: Decoration.mark({ class: "cm-underline --sev-warning" }),
+    information: Decoration.mark({ class: "cm-underline --sev-information" }),
 }
 
 const underlineTheme = EditorView.baseTheme({
     ".cm-underline": {
-        textDecoration:
-            "underline 3px hsla(var(--cm-underline-hue), 100%, 50%, 1)",
-        backgroundColor: "hsla(var(--cm-underline-hue), 100%, 50%, 0.1)",
+        textDecoration: "underline 3px hsla(var(--severity-hue), 100%, 50%, 1)",
+        backgroundColor: "hsla(var(--severity-hue), 100%, 50%, 0.1)",
     },
-
-    ".--error": { "--cm-underline-hue": "0" },
-    ".--warning": { "--cm-underline-hue": "36" },
-    ".--information": { "--cm-underline-hue": "204" },
 })
 
 export const addSquigglyLines = (

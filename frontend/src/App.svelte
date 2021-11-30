@@ -74,6 +74,18 @@
 <style lang="scss">
     @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 
+    :global(.--sev-error) {
+        --severity-hue: 0;
+    }
+
+    :global(.--sev-warning) {
+        --severity-hue: 36;
+    }
+
+    :global(.--sev-information) {
+        --severity-hue: 204;
+    }
+
     :global(html, body) {
         width: 100vw;
         height: 100vh;

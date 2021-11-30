@@ -6,13 +6,13 @@ import { computeHorizontalOffset } from "./horizontal-offset"
 
 const cursorTooltipBaseTheme = EditorView.baseTheme({
     ".cm-tooltip.cm-tooltip-cursor": {
-        backgroundColor: "#66b",
+        backgroundColor: "hsla(var(--severity-hue), 65%, 35%)",
         color: "white",
         border: "none",
         padding: "0.5em",
         borderRadius: "4px",
         "&.cm-tooltip-arrow:before": {
-            borderTopColor: "#66b",
+            borderTopColor: "hsla(var(--severity-hue), 65%, 35%)",
         },
         "&.cm-tooltip-arrow:after": {
             borderTopColor: "transparent",
@@ -59,7 +59,7 @@ const getCursorTooltips = (state: EditorState): readonly Tooltip[] => {
             arrow: true,
             create: () => {
                 let dom = document.createElement("div")
-                dom.className = "cm-tooltip-cursor"
+                dom.className = `cm-tooltip-cursor --sev-${diag.severity}`
                 dom.textContent = `[${diag.severity}] ${diag.message}`
                 return { dom }
             },
