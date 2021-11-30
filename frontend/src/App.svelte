@@ -73,6 +73,7 @@
 
 <style lang="scss">
     @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
 
     :global(.--sev-error) {
         --severity-hue: 0;
@@ -142,6 +143,7 @@
         }
         grid-area: editor;
         font-size: 1.3rem;
+        font-family: "Roboto Mono", monospace;
         --codemirror-min-height: 50vh;
     }
 

@@ -18,6 +18,16 @@ const cursorTooltipBaseTheme = EditorView.baseTheme({
             borderTopColor: "transparent",
         },
     },
+    ".cm-monospace-message": {
+        whiteSpace: "pre-wrap",
+        fontFamily: "'Roboto Mono', monospace",
+    },
+    ".cm-severity-icon": {
+        width: "0.66em",
+        height: "0.66em",
+        filter: "invert(100%)",
+        marginRight: "0.33em",
+    },
 })
 
 export const diagnosticsArrived = StateEffect.define<Diagnostic[]>()
@@ -58,10 +68,21 @@ const getCursorTooltips = (state: EditorState): readonly Tooltip[] => {
             strictSide: true,
             arrow: true,
             create: () => {
-                let dom = document.createElement("div")
-                dom.className = `cm-tooltip-cursor --sev-${diag.severity}`
-                dom.textContent = `[${diag.severity}] ${diag.message}`
-                return { dom }
+                const tooltip = document.createElement("div")
+                tooltip.className = `cm-tooltip-cursor --sev-${diag.severity}`
+
+                const icon = document.createElement("img")
+                icon.className = "cm-severity-icon"
+                icon.src = `/icons/severity-${diag.severity}.svg`
+
+                const message = document.createElement("span")
+                message.className = "cm-monospace-message"
+                message.appendChild(icon)
+                message.appendChild(document.createTextNode(diag.message))
+
+                tooltip.appendChild(icon)
+                tooltip.appendChild(message)
+                return { dom: tooltip }
             },
         }))
     })
