@@ -4,7 +4,7 @@ Small website that lets you play around with [`pyright`](https://github.com/micr
 
 I started this yesterday as of writing this, so it's really basic.
 
-See it in action here: [http://pyright-playground.decorator-factory.su/](Pyright playground)
+See it in action here: [Pyright playground](http://pyright-playground.decorator-factory.su/)
 
 ### TODO:
 
