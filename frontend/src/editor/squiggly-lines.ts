@@ -46,7 +46,10 @@ const underlineTheme = EditorView.baseTheme({
     },
 })
 
-export function addSquigglyLines(view: EditorView, diagostics: Diagnostic[]) {
+export const addSquigglyLines = (
+    view: EditorView,
+    diagostics: Diagnostic[],
+) => {
     const lines = view.state.doc.toJSON()
 
     const effects: StateEffect<unknown>[] = diagostics
@@ -74,7 +77,7 @@ export function addSquigglyLines(view: EditorView, diagostics: Diagnostic[]) {
     view.dispatch({ effects })
 }
 
-export function resetSquigglyLines(view: EditorView) {
+export const resetSquigglyLines = (view: EditorView) => {
     const effects: StateEffect<unknown>[] = [removeUnderlines.of(null)]
 
     if (!view.state.field(underlineField, false))

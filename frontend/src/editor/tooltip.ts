@@ -34,18 +34,7 @@ export const diagnosticsField = StateField.define<Readonly<
     },
 })
 
-const cursorTooltipField = StateField.define<readonly Tooltip[]>({
-    create: getCursorTooltips,
-
-    update(tooltips, tr) {
-        if (!tr.docChanged && !tr.selection) return tooltips
-        return getCursorTooltips(tr.state)
-    },
-
-    provide: (f) => showTooltip.computeN([f], (state) => state.field(f)),
-})
-
-function getCursorTooltips(state: EditorState): readonly Tooltip[] {
+const getCursorTooltips = (state: EditorState): readonly Tooltip[] => {
     const diagnostics = state.field(diagnosticsField)
 
     if (diagnostics === null) return []
@@ -77,6 +66,17 @@ function getCursorTooltips(state: EditorState): readonly Tooltip[] {
         }))
     })
 }
+
+const cursorTooltipField = StateField.define<readonly Tooltip[]>({
+    create: getCursorTooltips,
+
+    update(tooltips, tr) {
+        if (!tr.docChanged && !tr.selection) return tooltips
+        return getCursorTooltips(tr.state)
+    },
+
+    provide: (f) => showTooltip.computeN([f], (state) => state.field(f)),
+})
 
 export const cursorTooltip = () => {
     return [diagnosticsField, cursorTooltipField, cursorTooltipBaseTheme]
