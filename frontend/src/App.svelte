@@ -67,7 +67,7 @@
         <CodeMirror bind:editor />
     </div>
     <div class="footer">
-        BTW: This website is not run by Microsoft or the Pyright maintainers.
+        This website is not run by Microsoft or the Pyright maintainers.
     </div>
 </main>
 
@@ -149,6 +149,7 @@
     }
 
     .footer {
+        color: #444;
         grid-area: footer;
     }
 </style>
