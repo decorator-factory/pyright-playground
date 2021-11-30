@@ -12,9 +12,8 @@ See it in action here: [Pyright playground](https://pyright-playground.decorator
 - [ ] FEATURE: Pyright version picker
 - [ ] FEATURE: add general Pyright configuration
 - [ ] FEATURE: see if it's possible to display tooltips on hover?
-- [ ] FEATURE: make squiggly lines  colour-coded
 - [ ] FEATURE: save snippet to a gist/custom pastebin, like in mypy-play.net
-- [ ] BUG: fix newline display in tooltips 
+- [ ] BUG: fix newline display in tooltips
 - [ ] BUG: fix squiggly lines not showing up if the error is at the end of the file
 
 ### Disclaimer
