@@ -65,7 +65,7 @@ function getCursorTooltips(state: EditorState): readonly Tooltip[] {
                     (diag.range.start.line + 1 <= line)
                     && (diag.range.end.line + 1 >= line)
                     && (diag.range.start.character <= minCol)
-                    && (diag.range.end.character + 1 >= maxCol)
+                    && (diag.range.end.character >= maxCol)
                 )
             );
 

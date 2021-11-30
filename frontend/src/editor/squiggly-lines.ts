@@ -12,6 +12,10 @@ const underlineField = StateField.define<DecorationSet>({
         return Decoration.none
     },
     update(underlines, tr) {
+        if (tr.docChanged) {
+            return RangeSet.empty;
+        }
+
         underlines = underlines.map(tr.changes)
         for (let e of tr.effects) if (e.is(addUnderline)) {
             if (e.value.from >= e.value.to)
@@ -47,8 +51,8 @@ export function addSquigglyLines(view: EditorView, diagostics: Diagnostic[]) {
     const effects: StateEffect<unknown>[] =
         diagostics
         .map(diag => ({
-            from: computePos(lines, diag.range.start.line + 1, diag.range.start.character + 1),
-            to: computePos(lines, diag.range.end.line + 1, diag.range.end.character + 1),
+            from: computePos(lines, diag.range.start.line + 1, diag.range.start.character),
+            to: computePos(lines, diag.range.end.line + 1, diag.range.end.character),
         }))
         .map(({from, to}) => addUnderline.of({from, to}));
 
