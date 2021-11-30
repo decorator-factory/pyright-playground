@@ -12,24 +12,21 @@ const underlineField = StateField.define<DecorationSet>({
         return Decoration.none
     },
     update(underlines, tr) {
-        if (tr.docChanged) {
-            return RangeSet.empty
-        }
+        if (tr.docChanged) return RangeSet.empty
 
-        underlines = underlines.map(tr.changes)
+        for (let e of tr.effects)
+            if (e.is(removeUnderlines))
+                return RangeSet.empty
+
+
         for (let e of tr.effects)
             if (e.is(addUnderline)) {
                 if (e.value.from >= e.value.to) continue
+                if (e.value.to > tr.newDoc.length) continue
 
                 underlines = underlines.update({
                     add: [underlineMark.range(e.value.from, e.value.to)],
                 })
-            }
-
-        for (let e of tr.effects)
-            if (e.is(removeUnderlines)) {
-                underlines = RangeSet.empty
-                break
             }
 
         return underlines
