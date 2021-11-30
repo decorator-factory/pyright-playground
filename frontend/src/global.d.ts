@@ -1,10 +1,9 @@
 /// <reference types="svelte" />
 
-
 interface Settings {
-    apiEndpoint: string;
+    apiEndpoint: string
 }
 
 interface Window {
-    SETTINGS: Settings;
+    SETTINGS: Settings
 }

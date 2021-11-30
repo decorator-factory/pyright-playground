@@ -1,0 +1,7 @@
+{
+    "tabWidth": 4,
+    "semi": false,
+    "trailingComma": "all",
+    "svelteStrictMode": true,
+    "svelteAllowShorthand": true
+}
