@@ -10,8 +10,8 @@ from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 
-from backend.run_pyright import run_pyright
 from backend.better_middleware import BetterMiddleware
+from backend.run_pyright import run_pyright
 
 _cors_middleware = BetterMiddleware(lambda app: CORSMiddleware(
     app,
@@ -21,6 +21,8 @@ _cors_middleware = BetterMiddleware(lambda app: CORSMiddleware(
 ))
 
 app = Starlette(
-    routes=[Route("/pyright", run_pyright, methods=["POST"])],
+    routes=[
+        Route("/pyright", run_pyright, methods=["POST"]),
+    ],
     middleware=[_cors_middleware],
 )
