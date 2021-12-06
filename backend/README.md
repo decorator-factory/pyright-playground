@@ -16,4 +16,4 @@ the Python code as a string.
 5. Install Python 3.9 or later
 6. Install Poetry
 7. `poetry install`
-8. `uvicorn app:app`
+8. `uvicorn backend.app:app`
