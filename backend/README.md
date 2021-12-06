@@ -9,7 +9,11 @@ the Python code as a string.
 
 # How to run this?
 
-1. Install Python 3.10
-2. Install Poetry
-3. `poetry install`
-4. `uvicorn app:app`
+1. Install Node.js and `npm`
+2. Go to `lang-server/`
+3. Run `npm i
+4. Go back
+5. Install Python 3.9 or later
+6. Install Poetry
+7. `poetry install`
+8. `uvicorn app:app`
