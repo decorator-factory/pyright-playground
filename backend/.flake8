@@ -5,6 +5,8 @@ max-line-length = 100
 ignore =
     DAR101
     DAR201
+    D100
     D101
+    D104
     D105
     D107
