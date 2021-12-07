@@ -102,7 +102,7 @@ def parse_code_source(raw_source: object) -> Maybe[CodeSource]:
     elif keys == {"gist_id", "filename"}:
         return _parse_gist_source(raw_source)
 
-    elif keys == {"owner", "repo", "issue"}:
+    elif keys == {"issue"}:
         return _parse_github_issue_source(raw_source)
 
     return SimpleError("Expected either (gzip) or (gist_id,filename) or (owner,repo,issue)")
@@ -115,27 +115,15 @@ def _parse_gzip_source(raw_source: dict) -> Maybe[FromGzip]:
 
 
 def _parse_github_issue_source(raw_source: dict) -> Maybe[FromGithubIssue]:
-    if not isinstance(raw_source["owner"], str):
-        return SimpleError("Expected the `owner` field to be a string")
-    if not isinstance(raw_source["repo"], str):
-        return SimpleError("Expected the `repo` field to be a string")
+    if not isinstance(raw_source["issue"], str):
+        return SimpleError("Expected the `issue` field to be a string")
 
-    raw_issue = raw_source["issue"]
-    if isinstance(raw_issue, int):
-        issue_number = raw_issue
-    elif isinstance(raw_issue, str):
-        try:
-            issue_number = int(raw_issue)
-        except ValueError:
-            return SimpleError("Expected the `issue` field to be an integer")
-    else:
-        return SimpleError("Expected the `issue` field to be an integer")
+    match = re.match(r"([a-zA-Z_-]+)/([a-zA-Z_-]+)/(\d+)", raw_source["issue"])
+    if match is None:
+        return SimpleError("Expected the `issue` field to be `owner/repo/issue_number`")
 
-    return FromGithubIssue(
-        owner=raw_source["owner"],
-        repo=raw_source["repo"],
-        issue_number=issue_number,
-    )
+    owner, repo, issue_number = match.groups()
+    return FromGithubIssue(owner=owner, repo=repo, issue_number=int(issue_number))
 
 
 def _parse_gist_source(raw_source: dict) -> Maybe[FromGist]:
