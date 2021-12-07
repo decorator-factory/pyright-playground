@@ -1,13 +1,14 @@
 import base64
 import gzip
 import io
+import re
 import zlib
 from dataclasses import dataclass
 from typing import Union
 
 import httpx
 
-from backend.github import download_gist_file
+from backend.github import download_gist_file, download_github_issue
 from backend.simple_error import Maybe, SimpleError
 
 
@@ -22,7 +23,14 @@ class FromGist:
     filename: str
 
 
-CodeSource = Union[FromGzip, FromGist]
+@dataclass(frozen=True)
+class FromGithubIssue:
+    owner: str
+    repo: str
+    issue_number: int
+
+
+CodeSource = Union[FromGzip, FromGist, FromGithubIssue]
 
 
 HTTP_NOT_FOUND = 404
@@ -36,6 +44,17 @@ async def download_code(source: CodeSource) -> Maybe[str]:
     elif isinstance(source, FromGist):
         async with httpx.AsyncClient() as client:
             return await download_gist_file(client, source.gist_id, source.filename)
+    elif isinstance(source, FromGithubIssue):
+        async with httpx.AsyncClient() as client:  # noqa: WPS440
+            issue = await download_github_issue(
+                client,
+                source.owner,
+                source.repo,
+                source.issue_number,
+            )
+        if isinstance(issue, SimpleError):
+            return issue
+        return _extract_code_from_markdown(issue["body"])
 
 
 def _parse_string_from_gzip(source: FromGzip) -> Maybe[str]:
@@ -64,6 +83,13 @@ def _gzip_defuse(raw_zipped: bytes) -> Maybe[bytes]:
     return chunk
 
 
+def _extract_code_from_markdown(code: str) -> Maybe[str]:
+    match = re.search(r"```py((?:.|\n)+?)```", code)
+    if match is None:
+        return SimpleError("Code object not found in the issue")
+    return match[1]
+
+
 def parse_code_source(raw_source: object) -> Maybe[CodeSource]:
     """Attempt to turn an unstructured object into a code source."""
     if not isinstance(raw_source, dict):
@@ -71,20 +97,51 @@ def parse_code_source(raw_source: object) -> Maybe[CodeSource]:
 
     keys = set(raw_source)
     if keys == {"gzip"}:
-        if not isinstance(raw_source["gzip"], str):
-            return SimpleError("Expected the `gzip` field to be a base64-encoded string")
-        return FromGzip(raw_source["gzip"])
+        return _parse_gzip_source(raw_source)
 
     elif keys == {"gist_id", "filename"}:
         return _parse_gist_source(raw_source)
 
-    return SimpleError("Expected either {gzip: ...} or {gist_id: ..., filename: ...}")
+    elif keys == {"owner", "repo", "issue"}:
+        return _parse_github_issue_source(raw_source)
+
+    return SimpleError("Expected either (gzip) or (gist_id,filename) or (owner,repo,issue)")
 
 
-def _parse_gist_source(json: dict) -> Maybe[FromGist]:
-    if not isinstance(json["gist_id"], str):
+def _parse_gzip_source(raw_source: dict) -> Maybe[FromGzip]:
+    if not isinstance(raw_source["gzip"], str):
+        return SimpleError("Expected the `gzip` field to be a base64-encoded string")
+    return FromGzip(raw_source["gzip"])
+
+
+def _parse_github_issue_source(raw_source: dict) -> Maybe[FromGithubIssue]:
+    if not isinstance(raw_source["owner"], str):
+        return SimpleError("Expected the `owner` field to be a string")
+    if not isinstance(raw_source["repo"], str):
+        return SimpleError("Expected the `repo` field to be a string")
+
+    raw_issue = raw_source["issue"]
+    if isinstance(raw_issue, int):
+        issue_number = raw_issue
+    elif isinstance(raw_issue, str):
+        try:
+            issue_number = int(raw_issue)
+        except ValueError:
+            return SimpleError("Expected the `issue` field to be an integer")
+    else:
+        return SimpleError("Expected the `issue` field to be an integer")
+
+    return FromGithubIssue(
+        owner=raw_source["owner"],
+        repo=raw_source["repo"],
+        issue_number=issue_number,
+    )
+
+
+def _parse_gist_source(raw_source: dict) -> Maybe[FromGist]:
+    if not isinstance(raw_source["gist_id"], str):
         return SimpleError("Expected the `gist_id` field to be a string")
-    if not isinstance(json["filename"], str):
+    if not isinstance(raw_source["filename"], str):
         return SimpleError("Expected the `filename` field to be a string")
 
-    return FromGist(gist_id=json["gist_id"], filename=json["filename"])
+    return FromGist(gist_id=raw_source["gist_id"], filename=raw_source["filename"])

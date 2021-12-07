@@ -17,6 +17,10 @@ async def download_code_handler(request: Request) -> Response:
 
     - gist_id: string
       filename: string
+
+    - owner: string
+      repo: string
+      issue: number
     """
     raw_source = dict(request.query_params)
     source = parse_code_source(raw_source)
