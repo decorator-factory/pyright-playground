@@ -169,9 +169,9 @@
             font-family: "Roboto";
         }
         grid-area: editor;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-family: "Roboto Mono", monospace;
-        --codemirror-min-height: 50vh;
+        --codemirror-min-height: 66vh;
     }
 
     .footer {

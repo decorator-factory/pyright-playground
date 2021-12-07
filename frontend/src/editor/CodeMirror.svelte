@@ -17,5 +17,8 @@
         height: var(--codemirror-min-height);
         max-height: 100%;
         overflow-y: scroll;
+
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
     }
 </style>
