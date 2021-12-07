@@ -5,7 +5,8 @@
 
     import { onMount } from "svelte"
 
-    export let apiEndpoint: string
+    export let runPyrightEndpoint: string
+    export let downloadCodeEndpoint: string
 
     const lineAndColToPos = (line: number, col: number, code: string) => {
         const lines = code.split("\n")
@@ -22,7 +23,7 @@
 
     const fetchAndApplyPyrightDiagnostic = async () => {
         const code = editor.read()
-        const resp = await fetch(apiEndpoint, {
+        const resp = await fetch(runPyrightEndpoint, {
             method: "POST",
             body: JSON.stringify({ code }),
             headers: {
@@ -45,14 +46,39 @@
         await fetchAndApplyPyrightDiagnostic()
     }
 
-    onMount(() => {
+    const downloadCode = async () => {
+        const { search } = new URL(document.location.href)
+        if (!search.trim()) return
+
+        const resp = await fetch(`${downloadCodeEndpoint}${search}`)
+        if (resp.status !== 200) {
+            // TODO: handle error
+            return
+        }
+        editor.view.dispatch({
+            changes: {
+                from: 0,
+                to: editor.view.state.doc.length,
+            },
+        })
+        editor.view.dispatch({
+            changes: {
+                from: 0,
+                insert: await resp.text(),
+            },
+        })
+    }
+
+    onMount(async () => {
+        await downloadCode()
+
         editor.onUpdate(async (update) => {
             if (!update.docChanged) return
 
             await updateEditor()
         })
 
-        updateEditor()
+        await updateEditor()
     })
 </script>
 

@@ -3,7 +3,8 @@ import App from "./App.svelte"
 const app = new App({
     target: document.body,
     props: {
-        apiEndpoint: window.SETTINGS.apiEndpoint,
+        runPyrightEndpoint: window.SETTINGS.runPyrightEndpoint,
+        downloadCodeEndpoint: window.SETTINGS.downloadCodeEndpoint,
     },
 })
 

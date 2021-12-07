@@ -1,7 +1,8 @@
 /// <reference types="svelte" />
 
 interface Settings {
-    apiEndpoint: string
+    runPyrightEndpoint: string
+    downloadCodeEndpoint: string
 }
 
 interface Window {

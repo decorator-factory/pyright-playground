@@ -4,7 +4,8 @@
 
 ```js
 SETTINGS = {
-    apiEndpoint: "http://127.0.0.1:8000/pyright"
+    runPyrightEndpoint: "http://127.0.0.1:8000/pyright",
+    downloadCodeEndpoint: "http://127.0.0.1:8000/download_code",
 };
 ```
 
