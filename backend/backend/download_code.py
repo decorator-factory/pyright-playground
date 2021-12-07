@@ -84,7 +84,7 @@ def _gzip_defuse(raw_zipped: bytes) -> Maybe[bytes]:
 
 
 def _extract_code_from_markdown(code: str) -> Maybe[str]:
-    match = re.search(r"```py((?:.|\n)+?)```", code)
+    match = re.search(r"```(?:python|py)\s*\n((?:.|\n)+?)```", code)
     if match is None:
         return SimpleError("Code object not found in the issue")
     return match[1]
