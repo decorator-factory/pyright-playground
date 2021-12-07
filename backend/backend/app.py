@@ -11,6 +11,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 
 from backend.better_middleware import BetterMiddleware
+from backend.download_code_handler import download_code_handler
 from backend.run_pyright import run_pyright
 
 _cors_middleware = BetterMiddleware(lambda app: CORSMiddleware(
@@ -23,6 +24,7 @@ _cors_middleware = BetterMiddleware(lambda app: CORSMiddleware(
 app = Starlette(
     routes=[
         Route("/pyright", run_pyright, methods=["POST"]),
+        Route("/download_code", download_code_handler, methods=["GET", "POST"]),
     ],
     middleware=[_cors_middleware],
 )
