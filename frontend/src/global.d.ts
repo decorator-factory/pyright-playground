@@ -3,6 +3,8 @@
 interface Settings {
     runPyrightEndpoint: string
     downloadCodeEndpoint: string
+    generateDownloadLinkEndpoint: string
+    baseUrl: string
 }
 
 interface Window {

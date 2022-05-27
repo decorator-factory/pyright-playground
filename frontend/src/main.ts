@@ -5,6 +5,8 @@ const app = new App({
     props: {
         runPyrightEndpoint: window.SETTINGS.runPyrightEndpoint,
         downloadCodeEndpoint: window.SETTINGS.downloadCodeEndpoint,
+        generateDownloadLinkEndpoint: window.SETTINGS.generateDownloadLinkEndpoint,
+        baseUrl: window.SETTINGS.baseUrl,
     },
 })
 

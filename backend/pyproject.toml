@@ -6,9 +6,10 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-starlette = "^0.17.1"
-uvicorn = "^0.15.0"
-httpx = "^0.21.1"
+starlette = "0.17.1"
+uvicorn = "0.15.0"
+httpx = "0.21.1"
+yarl = "1.7.2"
 
 [tool.poetry.dev-dependencies]
 wemake-python-styleguide = "^0.15.3"

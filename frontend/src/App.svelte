@@ -7,6 +7,8 @@
 
     export let runPyrightEndpoint: string
     export let downloadCodeEndpoint: string
+    export let generateDownloadLinkEndpoint: string
+    export let baseUrl: string
 
     const lineAndColToPos = (line: number, col: number, code: string) => {
         const lines = code.split("\n")
@@ -69,6 +71,18 @@
         })
     }
 
+    const generatePermalink = async () => {
+        const resp = await fetch(`${generateDownloadLinkEndpoint}`, {
+            method: 'POST',
+            body: JSON.stringify({ base_url: baseUrl, code: editor.read() }),
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        const {download_link: downloadLink} = await resp.json()
+        window.location.href = downloadLink
+    }
+
     onMount(async () => {
         await downloadCode()
 
@@ -84,7 +98,9 @@
 
 <main>
     <div class="title">Pyright playground</div>
-    <div class="controls">Controls (TODO)</div>
+    <div class="controls">
+        <button on:click={generatePermalink} class="generate-permalink">Generate permalink</button>
+    </div>
     <div class="editor">
         <p class="editor-help">
             <b>To indent, press Ctrl+]. To unindent, press Ctrl+[.</b>
@@ -140,6 +156,11 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .generate-permalink {
+        padding: 1rem;
+        font-size: 1.2rem;
     }
 
     .title {
