@@ -100,6 +100,9 @@
     <div class="title">Pyright playground</div>
     <div class="controls">
         <button on:click={generatePermalink} class="generate-permalink">Generate permalink</button>
+        <a href="https://github.com/decorator-factory/pyright-playground">
+            <button class="github">Star or fork on GitHub</button>
+        </a>
     </div>
     <div class="editor">
         <p class="editor-help">
@@ -158,7 +161,8 @@
         align-items: center;
     }
 
-    .generate-permalink {
+    .generate-permalink,
+    .github {
         padding: 1rem;
         font-size: 1.2rem;
     }
@@ -173,8 +177,9 @@
     }
 
     .controls {
-        justify-content: start;
+        justify-content: space-between;
         padding-left: 3em;
+        padding-righ: 3em;
 
         grid-area: controls;
 
