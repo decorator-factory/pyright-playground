@@ -19,7 +19,7 @@
         return lengthSoFar + col
     }
 
-    let lastUpdatedMs = Date.now() - 1000
+    let lastUpdatedMs = Date.now() - 500
     let updateTimeoutId: any = -1
     let editor: Editor
 
@@ -39,9 +39,9 @@
 
     const updateEditor = async () => {
         const diff = Date.now() - lastUpdatedMs
-        if (diff < 1000) {
+        if (diff < 500) {
             if (updateTimeoutId !== -1) clearTimeout(updateTimeoutId)
-            updateTimeoutId = setTimeout(updateEditor, 1000 - diff)
+            updateTimeoutId = setTimeout(updateEditor, 500 - diff)
             return
         }
         lastUpdatedMs = Date.now()
