@@ -34,7 +34,7 @@ async def run_pyright(req: Request) -> Response:
     if not isinstance(code, str):
         return JSONResponse({"status": "fail", "error": "Expected a 'code' field with a string"})
 
-    pyright_output = await _run_pyright_on_code("1.1.190", code)
+    pyright_output = await _run_pyright_on_code("1.1.301", code)
 
     return JSONResponse(pyright_output)
 
