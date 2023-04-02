@@ -30,13 +30,13 @@ function serve() {
 }
 
 
-const devPlugins = [
+const devPlugins = () => [
     serve(),  // Call `npm run start` once the bundle has been generated
     livereload("public"),  // Watch the `public` directory and refresh the browser
 ];
 
 
-const productionPlugins = [
+const productionPlugins = () => [
     terser(),  // minify the output
 ];
 
@@ -72,7 +72,7 @@ export default {
             inlineSources: !production
         }),
 
-        ...production ? productionPlugins : devPlugins
+        ...production ? productionPlugins() : devPlugins()
     ],
     watch: {
         clearScreen: false

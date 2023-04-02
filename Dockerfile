@@ -11,15 +11,13 @@ RUN pip install poetry
 
 # Build frontend
 
-# <TODO> figure out why rollup -c hangs
-
-# COPY frontend /src/frontend
-# WORKDIR /src/frontend
-# RUN npm i
-# RUN npm run build
-# RUN mkdir -p /build/frontend
-# RUN cp -r /src/frontend/public /build/frontend
-# RUN rm -rf /src/frontend
+COPY frontend /src/frontend
+WORKDIR /src/frontend
+RUN npm i
+RUN npm run build
+RUN mkdir -p /build/frontend
+RUN cp -r /src/frontend/public /build/frontend
+RUN rm -rf /src/frontend
 
 COPY frontend/public /build/frontend
 ENV STATIC_PATH /build/frontend
