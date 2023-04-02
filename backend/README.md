@@ -16,4 +16,5 @@ the Python code as a string.
 5. Install Python 3.9 or later
 6. Install Poetry
 7. `poetry install`
-8. `uvicorn backend.app:app`
+8. Set the `STATIC_PATH` environment variable to point to `frontend/public`
+9. `uvicorn backend.app:app`

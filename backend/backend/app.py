@@ -23,7 +23,7 @@ _cors_middleware = BetterMiddleware(lambda app: CORSMiddleware(
     allow_headers=["content-type"],
 ))
 
-_static_path = os.getenv("STATIC_PATH", os.path.join(__file__, "..", "frontend", "public"))
+_static_path = os.environ["STATIC_PATH"]
 _index_path = os.path.join(_static_path, "index.html")
 
 app = Starlette(
