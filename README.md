@@ -1,3 +1,9 @@
+# 💀 Deprecation notice 
+
+There is now an official Pyright Playground: https://pyright-play.net/
+
+Use that instead!
+
 # Pyright playground
 
 Small website that lets you play around with [`pyright`](https://github.com/microsoft/pyright) -- a type checker for Python -- online.
